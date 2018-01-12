@@ -7,6 +7,8 @@ import java.lang.annotation.Target;
 
 /**
  * Created on 23.11.2017.
+ * <p>
+ * Indicates that a class has been patched and modified by sagittarius.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)

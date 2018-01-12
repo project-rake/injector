@@ -14,6 +14,9 @@ import org.bukkit.plugin.PluginManager;
 import java.util.Objects;
 import java.util.UUID;
 
+/**
+ * This class patches the original GameProfile to call events upon creation.
+ */
 @Patched
 public class GameProfile {
     private final Logger LOG = LogManager.getLogger(GameProfile.class);

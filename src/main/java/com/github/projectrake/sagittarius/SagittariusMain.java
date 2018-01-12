@@ -17,12 +17,6 @@ public class SagittariusMain {
     private static SagittariusMain instance;
     private boolean injected = false;
 
-//    private static final List<String> patchClasses = List.of(
-//            "com.mojang.authlib.GameProfile",
-//            "org.bukkit.plugin.java.JavaPlugin",
-//            "org.bukkit.plugin.java.PluginClassLoader"
-//    );
-
     private SagittariusMain() {
 
     }
@@ -43,19 +37,6 @@ public class SagittariusMain {
         Thread.currentThread().setContextClassLoader(loader);
         Class<?> clazz = loader.loadClass("org.bukkit.craftbukkit.Main");
         clazz.getMethod("main", new Class[]{String[].class}).invoke(null, new Object[]{args});
-
-        /*
-        for (String requestedClassname : patchClasses) {
-
-            CtClass clazz = ClassPool.getDefault().get(requestedClassname);
-            _assert(clazz.getAnnotation(Patched.class), "Missing @Patched annotation on " + requestedClassname);
-            clazz.setName(requestedClassname);
-            clazz.toClass();
-        }
-
-        injected = true;
-        */
-        //org.bukkit.craftbukkit.Main.main(args);
     }
 
     private File findSpigotJar() throws IOException {
@@ -99,6 +80,12 @@ public class SagittariusMain {
     private static void _assert(boolean annotation, String msg) {
         if (!annotation) {
             throw new AssertionError(msg);
+        }
+    }
+
+    public static void assertPatched(String classname) {
+        if (!requirePatched(classname)) {
+            throw new AssertionError("Class \"" + classname + "\" isn't patched.");
         }
     }
 
