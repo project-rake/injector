@@ -1,37 +1,58 @@
 package com.mojang.authlib;
 
+import com.github.projectrake.sagittarius.annotation.Patched;
 import com.mojang.authlib.properties.PropertyMap;
-import com.github.projectrake.injector.annotation.Patched;
-import com.github.projectrake.injector.events.EventSystem;
-import com.github.projectrake.injector.events.GameProfileCreationEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.bukkit.Bukkit;
+import org.bukkit.Server;
+import org.bukkit.event.Event;
+import org.bukkit.plugin.PluginManager;
 
+import java.util.Objects;
 import java.util.UUID;
 
 @Patched
 public class GameProfile {
+    private final Logger LOG = LogManager.getLogger(GameProfile.class);
     private final UUID id;
+    private final String originalName;
     private final String name;
     private final PropertyMap properties = new PropertyMap();
     private boolean legacy;
 
-    public GameProfile(UUID uUID, String string) {
-        if (uUID == null && StringUtils.isBlank(string)) {
-            throw new IllegalArgumentException("Name and ID cannot both be blank");
+    public GameProfile(UUID uUID, String name) {
+        originalName = name;
+
+        if (uUID != null && name != null) {
+            CompleteGameProfileCreationEvent cev = new CompleteGameProfileCreationEvent(uUID, name);
+            tryCallEvent(cev);
+
+            this.name = Objects.requireNonNull(cev.getName());
+            this.id = Objects.requireNonNull(cev.getUuid());
+        } else {
+            GameProfileCreationEvent ev = new GameProfileCreationEvent(uUID, name);
+            tryCallEvent(ev);
+
+            this.name = ev.getName();
+            this.id = ev.getUuid();
         }
 
-        GameProfileCreationEvent ev = new GameProfileCreationEvent(uUID, string);
-        EventSystem.getInstance().call(ev);
-        UUID realUUID = ev.getUuid();
-        String realName = ev.getName();
-
-        if (realUUID == null && StringUtils.isBlank(realName)) {
+        if (this.id == null && StringUtils.isBlank(this.name)) {
             throw new IllegalArgumentException("Name and ID cannot both be blank");
         }
+    }
 
-        this.id = realUUID;
-        this.name = realName;
+    private void tryCallEvent(Event ev) {
+        Server serv = Bukkit.getServer();
+        if (serv != null) {
+            PluginManager manager = serv.getPluginManager();
+            manager.callEvent(ev);
+        } else {
+            LOG.warn("Early construction detected. Server unavailable. This may be an error.");
+        }
     }
 
     public UUID getId() {
@@ -65,6 +86,10 @@ public class GameProfile {
             return false;
         }
         return true;
+    }
+
+    public String getOriginalName() {
+        return originalName;
     }
 
     public int hashCode() {

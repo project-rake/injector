@@ -1,4 +1,4 @@
-package com.github.projectrake.injector;
+package com.github.projectrake.sagittarius;
 
 import java.util.HashMap;
 import java.util.Map;

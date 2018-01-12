@@ -1,4 +1,7 @@
-package com.github.projectrake.injector.events;
+package com.mojang.authlib;
+
+import org.bukkit.event.Event;
+import org.bukkit.event.HandlerList;
 
 import java.util.UUID;
 
@@ -6,6 +9,7 @@ import java.util.UUID;
  * Created on 22.11.2017.
  */
 public class GameProfileCreationEvent extends Event {
+    private static final HandlerList handlers = new HandlerList();
     private UUID uuid;
     private String name;
 
@@ -36,5 +40,13 @@ public class GameProfileCreationEvent extends Event {
                 "uuid=" + uuid +
                 ", name='" + name + '\'' +
                 "}";
+    }
+
+    public HandlerList getHandlers() {
+        return handlers;
+    }
+
+    public static HandlerList getHandlerList() {
+        return handlers;
     }
 }

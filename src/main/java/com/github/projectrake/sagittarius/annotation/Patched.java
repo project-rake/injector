@@ -1,4 +1,4 @@
-package com.github.projectrake.injector.annotation;
+package com.github.projectrake.sagittarius.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
